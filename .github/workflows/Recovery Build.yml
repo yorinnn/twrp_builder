@@ -59,12 +59,25 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt update -y
-        suso apt install openssh rsync git python3 python-is-python3 repo -y
+        sudo apt install openssh rsync git python3 python-is-python3 repo -y
     
     - name: Setup environment
       run: |
         git config --global user.name actions
         git config --global user.name actions@github.com
+    - name: Enable and configure zram swap
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zram-tools
+        sudo modprobe zram
+    # 设置 zram0 的大小为物理内存的一半
+        MEM=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+        SIZE=$((MEM * 1024 / 2))
+        echo $SIZE | sudo tee /sys/block/zram0/disksize
+        sudo mkswap /dev/zram0
+        sudo swapon /dev/zram0
+        swapon --show
+        free -h
 
     - name: Init repo
       run: |

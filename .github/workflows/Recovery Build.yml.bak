@@ -65,9 +65,23 @@ jobs:
       run: |
         git config --global user.name actions
         git config --global user.name actions@github.com
+    - name: Enable and configure zram swap
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zram-tools
+        sudo modprobe zram
+    # 设置 zram0 的大小为物理内存的一半
+        MEM=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+        SIZE=$((MEM * 1024 / 2))
+        echo $SIZE | sudo tee /sys/block/zram0/disksize
+        sudo mkswap /dev/zram0
+        sudo swapon /dev/zram0
+        swapon --show
+        free -h
 
     - name: Init repo
       run: |
+        repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
         
     - name: Show System Info
       run: |
@@ -80,3 +94,6 @@ jobs:
         echo "-------------------------------------------------"
         echo "df"
         df -h
+        echo "-------------------------------------------------"
+        echo "du"
+        du / -hd3
