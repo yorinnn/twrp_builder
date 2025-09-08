@@ -1,0 +1,69 @@
+name: TWRP 16 Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      TWRP_MANIFEST_URL:
+        description: "TWRP manifest url"
+        required: true
+        default: "https://github.com/TWRP-Test/platform_manifest_twrp_aosp"
+      TWRP_MANIFEST_BRANCH:
+        description: "TWRP branch"
+        required: true
+        default: "twrp-16.0"
+      DEVICE_TREE_URL:
+        description: "DEVICE_TREE_URL"
+        required: true
+        default: "https://github.com/kmiit/twrp_device_oplus_sm87xx"
+      DEVICE_TREE_BRANCH:
+        description: "DEVICE_TREE_BRANCH"
+        required: true
+        default: "twrp-16.0"
+      DEVICE_PATH:
+        description: "DEVICE_PATH"
+        required: true
+        default: "device/oplus/sm87xx"
+      MAKE_TARGET:
+        description: "MAKE_TARGET"
+        required: true
+        default: "twrp_sm87xx"
+      BUILD_PARTITION:
+        description: "BUILD_PARTITION"
+        required: true
+        default: "recovery"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+    - name: Display Build Info
+      run: |
+        echo "::group::User Environment Variables"
+        echo "Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}"
+        echo "Manifest Branch: ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}"
+        echo "Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}"
+        echo "Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}"
+        echo "Device Path: ${{ github.event.inputs.DEVICE_PATH }}"
+        echo "Makefile Name: ${{ github.event.inputs.MAKE_TARGET }}"
+        echo "Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img"
+        echo "::endgroup::"
+
+    - name: Check Out
+      uses: actions/checkout@v4
+  
+    - name: Cleanup
+      uses: rokibhasansagar/slimhub_actions@main
+
+    - name: Show System Info
+      run: |
+        echo "--------- show system info -------------------"
+        echo "lsblk"
+        lsblk
+        echo "-------------------------------------------------"
+        echo "free"
+        free -h
+        echo "-------------------------------------------------"
+        echo "df"
+        df -h
