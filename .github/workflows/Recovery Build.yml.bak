@@ -46,18 +46,18 @@ jobs:
       id: show_build_info
       run: |
         echo "::group::User Environment Variables"
-        echo "::set-output name=build_info::$(cat << 'EOF' | sed 's/^[[:space:]]*//'
-          Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}
-          Manifest Branch: ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}
-          Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}
-          Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}
-          Device Path: ${{ github.event.inputs.DEVICE_PATH }}
-          Device name: ${{ github.event.inputs.DEVICE_NAME }}
-          Lunch target: ${{ github.event.inputs.LUNCH_TARGET }}
-          Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img
-          EOF
-          )"
-        echo "::endgroup::"
+        {
+          echo 'BUILD_INFO<<EOF'
+          echo Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}
+          echo Manifest Branch: ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}
+          echo Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}
+          echo Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}
+          echo Device Path: ${{ github.event.inputs.DEVICE_PATH }}
+          echo Device name: ${{ github.event.inputs.DEVICE_NAME }}
+          echo Lunch target: ${{ github.event.inputs.LUNCH_TARGET }}
+          echo Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img
+          echo EOF
+        } >> "$GITHUB_ENV"
 
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
@@ -79,7 +79,7 @@ jobs:
         sudo apt install repo -y
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
-        echo -e ${{ steps.show_build_info.outputs.build_info }} >> INFO.txt
+        echo -e "${BUILD_INFO}" >> INFO.txt
         echo "Change log:" >> INFO.txt
         set +e
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
