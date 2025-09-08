@@ -77,9 +77,9 @@ jobs:
         export DEBIAN_FRONTEND=noninteractive
         sudo apt update && sudo apt upgrade -y
         sudo apt install repo -y
-        git config user.name "${{ github.actor }}"
-        git config user.email "${{ github.actor }}@users.noreply.github.com"
-        echo -e "${BUILD_INFO}" >> INFO.txt
+        git config user.name ${{ github.actor }}
+        git config user.email ${{ github.actor }}@users.noreply.github.com
+        echo -e "$BUILD_INFO" >> INFO.txt
         echo "Change log:" >> INFO.txt
         set +e
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
