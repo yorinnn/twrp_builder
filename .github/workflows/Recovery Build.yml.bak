@@ -12,11 +12,11 @@ on:
         required: true
         default: "twrp-16.0"
       DEVICE_TREE_URL:
-        description: "DEVICE_TREE_URL"
+        description: "Device tree urlL"
         required: true
         default: "https://github.com/kmiit/twrp_device_oplus_sm87xx"
       DEVICE_TREE_BRANCH:
-        description: "Device tree url"
+        description: "Device tree branch"
         required: true
         default: "twrp-16.0"
       DEVICE_PATH:
