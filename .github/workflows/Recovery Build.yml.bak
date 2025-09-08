@@ -42,17 +42,20 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Display build info
+    - name: Show build info
+      id: show_build_info
       run: |
         echo "::group::User Environment Variables"
-        echo -e "Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}\n" \
-                 "Manifest Branch: ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}\n" \
-                 "Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}\n" \
-                 "Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}\n" \
-                 "Device Path: ${{ github.event.inputs.DEVICE_PATH }}\n" \
-                 "Device name: ${{ github.event.inputs.DEVICE_NAME }}\n" \
-                 "Lunch target: ${{ github.event.inputs.LUNCH_TARGET }}\n" \
-                 "Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img\n" | tee INFO.txt
+        echo "::set-output name=build_info::$(cat << 'EOF' | sed 's/^[[:space:]]*//'
+          Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}
+          Manifest Branch: ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}
+          Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}
+          Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}
+          Device Path: ${{ github.event.inputs.DEVICE_PATH }}
+          Device name: ${{ github.event.inputs.DEVICE_NAME }}
+          Lunch target: ${{ github.event.inputs.LUNCH_TARGET }}
+          Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img
+          EOF )"
         echo "::endgroup::"
 
     - name: Cleanup
@@ -70,9 +73,10 @@ jobs:
       run: |
         export DEBIAN_FRONTEND=noninteractive
         sudo apt update && sudo apt upgrade -y
-        #sudo apt install repo -y
+        sudo apt install repo -y
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
+        echo -e ${{ steps.show_build_info.outputs.build_info }} >> INFO.txt
         echo "Change log:" >> INFO.txt
         set +e
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
@@ -85,10 +89,6 @@ jobs:
 
     - name: Init source
       run: |
-        mkdir ~/bin
-        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-        chmod a+x ~/bin/repo
-        sudo ln -sf ~/bin/repo /usr/bin/repo
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
         repo sync
     
