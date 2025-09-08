@@ -57,9 +57,7 @@ jobs:
 
     - name: Check Out
       uses: actions/checkout@v4
-  
 
-     
     - name: Install Dependencies
       run: |
         sudo apt update -y
