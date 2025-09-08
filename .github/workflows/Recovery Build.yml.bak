@@ -28,7 +28,7 @@ on:
         required: true
         default: "sm87xx"
       LUNCH_TARGET:
-        description: "lunch twrp_ (default same as lunch target))"
+        description: "lunch twrp_ (default same as lunch target)"
         required: false
         default: ""
       BUILD_PARTITION:
