@@ -45,7 +45,6 @@ jobs:
     - name: Show build info
       id: show_build_info
       run: |
-        echo "::group::User Environment Variables"
         {
           echo 'BUILD_INFO<<EOF'
           echo Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}
@@ -108,7 +107,9 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
+        (while true; do echo "Building TWRP..."; sleep 120; done) &
         m ${{ github.event.inputs.BUILD_PARTITION }}image
+        kill $!
         ls
 
     - name: Upload to Release
