@@ -100,7 +100,6 @@ jobs:
         fi
         m ${{ github.event.inputs.BUILD_PARTITION }}image
         ls
-        
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
