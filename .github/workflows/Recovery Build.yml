@@ -92,6 +92,9 @@ jobs:
     - name: Init source
       run: |
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
+        (while true; do echo "Pulling Source..."; sleep 120; done) &
+        KEEP_ALIVE_PID=$!
+        trap "kill $KEEP_ALIVE_PID" EXIT
         repo sync
     
     - name: Setup device

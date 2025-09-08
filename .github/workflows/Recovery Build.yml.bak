@@ -108,9 +108,9 @@ jobs:
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
         (while true; do echo "Building TWRP..."; sleep 120; done) &
+        KEEP_ALIVE_PID=$!
+        trap "kill $KEEP_ALIVE_PID" EXIT
         m ${{ github.event.inputs.BUILD_PARTITION }}image
-        kill $!
-        ls
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
