@@ -50,34 +50,24 @@ jobs:
         echo "Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img"
         echo "::endgroup::"
 
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+
     - name: Check Out
       uses: actions/checkout@v4
   
-    - name: Cleanup
-      uses: rokibhasansagar/slimhub_actions@main
+    # - name: Cleanup
+    #   uses: rokibhasansagar/slimhub_actions@main
      
     - name: Install Dependencies
       run: |
         sudo apt update -y
-        sudo apt install openssh rsync git python3 python-is-python3 repo -y
+        sudo apt install rsync git python3 python-is-python3 repo -y
     
     - name: Setup environment
       run: |
         git config --global user.name actions
         git config --global user.name actions@github.com
-
-    - name: Enable and configure zram swap
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y zram-tools
-        sudo modprobe zram
-        MEM=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-        SIZE=$((MEM * 1024 / 2))
-        echo $SIZE | sudo tee /sys/block/zram0/disksize
-        sudo mkswap /dev/zram0
-        sudo swapon /dev/zram0
-        swapon --show
-        free -h
 
     - name: Init repo
       run: |
