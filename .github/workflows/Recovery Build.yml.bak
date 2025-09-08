@@ -59,7 +59,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt update -y
-        suso apt install openssh rsync git python3 python-is-python3 repo -y
+        sudo apt install openssh rsync git python3 python-is-python3 repo -y
     
     - name: Setup environment
       run: |
