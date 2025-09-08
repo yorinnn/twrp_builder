@@ -77,7 +77,7 @@ jobs:
         pwd
         export DEBIAN_FRONTEND=noninteractive
         sudo apt update && sudo apt upgrade -y
-        sudo apt install repo -y
+        #sudo apt install repo -y
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
         echo "Change log: \n" >> INFO.txt
@@ -95,6 +95,10 @@ jobs:
         pwd
         cd ${GITHUB_WORKSPACE}
         pwd
+        mkdir ~/bin
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        chmod a+x ~/bin/repo
+        sudo ln -sf ~/bin/repo /usr/bin/repo
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
         repo sync
     
