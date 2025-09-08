@@ -16,39 +16,46 @@ on:
         required: true
         default: "https://github.com/kmiit/twrp_device_oplus_sm87xx"
       DEVICE_TREE_BRANCH:
-        description: "DEVICE_TREE_BRANCH"
+        description: "Device tree url"
         required: true
         default: "twrp-16.0"
       DEVICE_PATH:
-        description: "DEVICE_PATH"
+        description: "Device path"
         required: true
         default: "device/oplus/sm87xx"
-      MAKE_TARGET:
-        description: "MAKE_TARGET"
+      DEVICE_NAME:
+        description: "Device name"
         required: true
-        default: "twrp_sm87xx"
+        default: "sm87xx"
+      LUNCH_TARGET:
+        description: "lunch twrp_ (default same as lunch target))"
+        required: false
+        default: ""
       BUILD_PARTITION:
-        description: "BUILD_PARTITION"
+        description: "Build partition"
         required: true
         default: "recovery"
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
     - name: Display Build Info
       run: |
+        INFO_FILE=INFO.txt
         echo "::group::User Environment Variables"
-        echo "Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}"
-        echo "Manifest Branch: ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}"
-        echo "Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}"
-        echo "Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}"
-        echo "Device Path: ${{ github.event.inputs.DEVICE_PATH }}"
-        echo "Makefile Name: ${{ github.event.inputs.MAKE_TARGET }}"
-        echo "Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img"
+        echo -e "Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}" \
+                 "Manifest Branch: ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}" \
+                 "Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}" \
+                 "Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}" \
+                 "Device Path: ${{ github.event.inputs.DEVICE_PATH }}" \
+                 "Device name: ${{ github.event.inputs.DEVICE_NAME }}" \
+                 "Lunch target: ${{ github.event.inputs.LUNCH_TARGET }}" \
+                 "Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img\n" | tee $INFO_FILE
         echo "::endgroup::"
+
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
 
@@ -58,31 +65,51 @@ jobs:
     - name: Check Out
       uses: actions/checkout@v4
 
-    - name: Install Dependencies
+    - name: Setup environment
       run: |
         sudo apt update -y
         sudo apt install rsync git python3 python-is-python3 repo -y
-    
-    - name: Setup environment
-      run: |
-        git config --global user.name actions
-        git config --global user.name actions@github.com
+        git config user.name "${{ github.actor }}"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+        echo "Change log: \n" >> INFO.txt
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
+        if [ $? -eq 0 ]; then
+          git log "$LAST_TAG"..HEAD --pretty=format:"- %h-%an: %s" | tee -a INFO.txt
+        else
+          git log --pretty=format:"- %h-%an: %s" | tee -a INFO.txt
+        fi
+        cat INFO.txt
 
-    - name: Init repo
+    - name: Init source
       run: |
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
-        
-    - name: Show System Info
+        repo sync
+    
+    - name: Setup device
       run: |
-        echo "--------- show system info -------------------"
-        echo "lsblk"
-        lsblk
-        echo "-------------------------------------------------"
-        echo "free"
-        free -h
-        echo "-------------------------------------------------"
-        echo "df"
-        df -h
-        echo "-------------------------------------------------"
-        echo "du /mnt"
-        du /mnt -hd2
+        git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ${{ github.event.inputs.DEVICE_PATH }} --depth=1
+        
+    - name: Build TWRP
+      run: |
+        source build/envsetup.sh
+        export ALLOW_MISSING_DEPENDENCIES=true
+        if [ -n "${{ github.event.inputs.LUNCH_TARGET }}" ]; then
+          lunch twrp_${{ github.event.inputs.LUNCH_TARGET }}
+        else
+          lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
+        fi
+        m ${{ github.event.inputs.BUILD_PARTITION }}image
+        ls
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: | 
+          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img
+          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.zip
+          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*vendor*.img
+        name: TWRP-3.7.1-16-${{ github.event.inputs.DEVICE_NAME }}-${date +"%Y%m%d"}${{ github.run_id }}
+        tag_name: TWRP-3.7.1-16-${{ github.event.inputs.DEVICE_NAME }}-${date +"%Y%m%d"}${{ github.run_id }}
+        body_path: INFO.txt
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
