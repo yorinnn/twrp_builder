@@ -44,6 +44,9 @@ jobs:
     steps:
     - name: Display build info
       run: |
+        pwd
+        cd ${GITHUB_WORKSPACE}
+        pwd
         INFO_FILE=INFO.txt
         echo "::group::User Environment Variables"
         echo -e "Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}\n" \
@@ -61,6 +64,8 @@ jobs:
 
     - name: Maximize build space
       uses: easimon/maximize-build-space@master
+      with:
+        swap-size-mb: 16384
 
     - name: Check Out
       uses: actions/checkout@v4
@@ -73,6 +78,7 @@ jobs:
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
         echo "Change log: \n" >> INFO.txt
+        set +e
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
         if [ $? -eq 0 ]; then
           git log "$LAST_TAG"..HEAD --pretty=format:"- %h-%an: %s" | tee -a INFO.txt

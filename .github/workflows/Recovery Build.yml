@@ -44,6 +44,9 @@ jobs:
     steps:
     - name: Display build info
       run: |
+        pwd
+        cd ${GITHUB_WORKSPACE}
+        pwd
         INFO_FILE=INFO.txt
         echo "::group::User Environment Variables"
         echo -e "Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}\n" \
@@ -61,12 +64,17 @@ jobs:
 
     - name: Maximize build space
       uses: easimon/maximize-build-space@master
+      with:
+        swap-size-mb: 16384
 
     - name: Check Out
       uses: actions/checkout@v4
 
     - name: Setup environment
       run: |
+        pwd
+        cd ${GITHUB_WORKSPACE}
+        pwd
         export DEBIAN_FRONTEND=noninteractive
         sudo apt update && sudo apt upgrade -y
         sudo apt install repo -y
@@ -84,15 +92,24 @@ jobs:
 
     - name: Init source
       run: |
+        pwd
+        cd ${GITHUB_WORKSPACE}
+        pwd
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
         repo sync
     
     - name: Setup device
       run: |
+        pwd
+        cd ${GITHUB_WORKSPACE}
+        pwd
         git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ${{ github.event.inputs.DEVICE_PATH }} --depth=1
         
     - name: Build TWRP
       run: |
+        pwd
+        cd ${GITHUB_WORKSPACE}
+        pwd
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         if [ -n "${{ github.event.inputs.LUNCH_TARGET }}" ]; then
@@ -107,11 +124,11 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: | 
-          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img
-          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.zip
-          out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*vendor*.img
+          ${GITHUB_WORKSPACE}/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img
+          ${GITHUB_WORKSPACE}/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.zip
+          ${GITHUB_WORKSPACE}/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*vendor*.img
         name: TWRP-3.7.1-16-${{ github.event.inputs.DEVICE_NAME }}-${date +"%Y%m%d"}${{ github.run_id }}
         tag_name: TWRP-3.7.1-16-${{ github.event.inputs.DEVICE_NAME }}-${date +"%Y%m%d"}${{ github.run_id }}
-        body_path: INFO.txt
+        body_path: ${GITHUB_WORKSPACE}/INFO.txt
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
