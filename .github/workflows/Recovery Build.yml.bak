@@ -42,7 +42,7 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Display Build Info
+    - name: Display build info
       run: |
         INFO_FILE=INFO.txt
         echo "::group::User Environment Variables"

@@ -69,7 +69,7 @@ jobs:
       run: |
         export DEBIAN_FRONTEND=noninteractive
         sudo apt update && sudo apt upgrade -y
-        sudo apt install rsync git python3 python-is-python3 repo -y 2>&1
+        sudo apt install repo -y
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
         echo "Change log: \n" >> INFO.txt
