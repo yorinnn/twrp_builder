@@ -68,7 +68,6 @@ jobs:
 
     - name: Init repo
       run: |
-        repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
         
     - name: Show System Info
       run: |
@@ -81,6 +80,3 @@ jobs:
         echo "-------------------------------------------------"
         echo "df"
         df -h
-        echo "-------------------------------------------------"
-        echo "du"
-        du / -hd3
