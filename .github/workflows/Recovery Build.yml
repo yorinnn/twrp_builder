@@ -55,7 +55,8 @@ jobs:
           Device name: ${{ github.event.inputs.DEVICE_NAME }}
           Lunch target: ${{ github.event.inputs.LUNCH_TARGET }}
           Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img
-          EOF )"
+          EOF
+          )"
         echo "::endgroup::"
 
     - name: Cleanup

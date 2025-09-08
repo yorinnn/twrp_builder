@@ -67,7 +67,9 @@ jobs:
         swap-size-mb: 16384
 
     - name: Check Out
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
 
     - name: Setup environment
       run: |
