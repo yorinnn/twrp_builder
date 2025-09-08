@@ -42,17 +42,17 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Display Build Info
+    - name: Display build info
       run: |
         INFO_FILE=INFO.txt
         echo "::group::User Environment Variables"
-        echo -e "Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}" \
-                 "Manifest Branch: ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}" \
-                 "Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}" \
-                 "Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}" \
-                 "Device Path: ${{ github.event.inputs.DEVICE_PATH }}" \
-                 "Device name: ${{ github.event.inputs.DEVICE_NAME }}" \
-                 "Lunch target: ${{ github.event.inputs.LUNCH_TARGET }}" \
+        echo -e "Manifest URL: ${{ github.event.inputs.TWRP_MANIFEST_URL }}\n" \
+                 "Manifest Branch: ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}\n" \
+                 "Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}\n" \
+                 "Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}\n" \
+                 "Device Path: ${{ github.event.inputs.DEVICE_PATH }}\n" \
+                 "Device name: ${{ github.event.inputs.DEVICE_NAME }}\n" \
+                 "Lunch target: ${{ github.event.inputs.LUNCH_TARGET }}\n" \
                  "Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img\n" | tee $INFO_FILE
         echo "::endgroup::"
 
