@@ -91,12 +91,7 @@ jobs:
     - name: Init source
       run: |
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
-        repo sync 2>&1 > sync.log &
-        SYNC_PROCESS=$!
-        tail -F sync.log &
-        TAIL_PROCESS=$!
-        wait $SYNC_PROCESS
-        kill $TAIL_PROCESS
+        repo sync
     
     - name: Setup device
       run: |
@@ -104,6 +99,7 @@ jobs:
         
     - name: Build TWRP
       run: |
+        export TERM=xterm
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         if [ -n "${{ github.event.inputs.LUNCH_TARGET }}" ]; then
@@ -111,13 +107,7 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
-        m ${{ github.event.inputs.BUILD_PARTITION }}image 2>&1 > build.log &
-        BUILD_PROCESS=$!
-        tail -F sync.log &
-        TAIL_PROCESS=$!
-        wait $BUILD_PROCESS
-        kill $TAIL_PROCESS
-        
+        m ${{ github.event.inputs.BUILD_PARTITION }}image
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2

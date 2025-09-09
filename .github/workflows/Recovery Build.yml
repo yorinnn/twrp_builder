@@ -87,19 +87,22 @@ jobs:
         else
           git log --pretty=format:"- %h-%an: %s" >> INFO.txt
         fi
+        cat INFO.txt
 
     - name: Init source
       run: |
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
-        repo sync -v
-    
+        (while true; do echo "Syncing source..."; sleep 120; done) &
+        KA_PID=$!
+        repo sync
+        kill $KA_PID
+
     - name: Setup device
       run: |
         git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ${{ github.event.inputs.DEVICE_PATH }} --depth=1
         
     - name: Build TWRP
       run: |
-        export TERM=xterm
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         if [ -n "${{ github.event.inputs.LUNCH_TARGET }}" ]; then
@@ -107,7 +110,10 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
-        m ${{ github.event.inputs.BUILD_PARTITION }}image
+        (while true; do echo "${date +\"%Y%m%d\"}: Building TWRP..."; sleep 30; done) &
+        KA_PID=$!
+        m ${{ github.event.inputs.BUILD_PARTITION }}image -j3
+        kill $KA_PID
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
