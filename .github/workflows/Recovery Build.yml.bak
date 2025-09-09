@@ -100,7 +100,7 @@ jobs:
         (while true; do echo "Syncing source..."; sleep 120; done) &
         KA_PID=$!
         repo sync
-        kill $KA_PID
+        kill $KA_PID && exit 0
 
     - name: Setup device
       run: |
@@ -119,7 +119,7 @@ jobs:
         (while true; do echo "${date +\"%Y%m%d\"}: Building TWRP..."; sleep 30; done) &
         KA_PID=$!
         m ${{ github.event.inputs.BUILD_PARTITION }}image -j3
-        kill $KA_PID
+        kill $KA_PID && exit 0
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
