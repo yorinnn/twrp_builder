@@ -87,12 +87,13 @@ jobs:
         else
           git log --pretty=format:"- %h-%an: %s" >> INFO.txt
         fi
-        cat INFO.txt
 
     - name: Init source
       run: |
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
-        repo sync 2>&1 | tee sync.log
+        repo sync 2>&1 > sync.log &
+        SYNC_PROCESS=$!
+        tail -F sync.log & kill -0 $SYNC_PROCESS
     
     - name: Setup device
       run: |
@@ -107,7 +108,7 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
-        m ${{ github.event.inputs.BUILD_PARTITION }}image | tee build.log
+        m ${{ github.event.inputs.BUILD_PARTITION }}image 2>&1 | tee build.log
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
