@@ -67,7 +67,7 @@ jobs:
         swap-size-mb: 16384
         remove-dotnet: true
         remove-android: true
-        remove-haskell: true
+        # remove-haskell: true
         remove-codeql: true
         remove-docker-images: true
 
@@ -116,7 +116,7 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
-        (while true; do echo "${date +\"%Y%m%d\"}: Building TWRP..."; sleep 30; done) &
+        (while true; do echo `date +%T` ": Building TWRP..."; sleep 30; done) &
         KA_PID=$!
         m ${{ github.event.inputs.BUILD_PARTITION }}image -j3
         kill $KA_PID && exit 0
