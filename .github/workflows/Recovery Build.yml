@@ -58,13 +58,13 @@ jobs:
           echo EOF
         } >> "$GITHUB_ENV"
 
-    # - name: Cleanup
-      # uses: rokibhasansagar/slimhub_actions@main
+    - name: Cleanup
+      uses: rokibhasansagar/slimhub_actions@main
 
     - name: Maximize build space
       uses: easimon/maximize-build-space@master
       with:
-        swap-size-mb: 16384
+        swap-size-mb: 32768
         remove-dotnet: true
         remove-android: true
         # remove-haskell: true
@@ -117,9 +117,9 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
-        (while true; do echo `date +%T` ": Building TWRP..."; sleep 30; done) &
+        (while true; do echo `date +%T` "Building TWRP...";free -h; sleep 10; done) &
         KA_PID=$!
-        m ${{ github.event.inputs.BUILD_PARTITION }}image -j3
+        m ${{ github.event.inputs.BUILD_PARTITION }}image -j2
         kill $KA_PID && exit 0
 
     - name: Upload to Release
