@@ -81,7 +81,7 @@ jobs:
         echo Current swapness:
         sudo cat /proc/sys/vm/swappiness
         echo Setting new swapness
-        sudo sysctl -w vm.swappiness=80
+        sudo sysctl -w vm.swappiness=100
         echo New swapness:
         sudo cat /proc/sys/vm/swappiness
 
