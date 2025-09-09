@@ -65,11 +65,11 @@ jobs:
       uses: easimon/maximize-build-space@master
       with:
         swap-size-mb: 32768
-        remove-dotnet: true
-        remove-android: true
+        # remove-dotnet: true
+        # remove-android: true
         # remove-haskell: true
-        remove-codeql: true
-        remove-docker-images: true
+        # remove-codeql: true
+        # remove-docker-images: true
 
     - name: Check Out
       uses: actions/checkout@v5
@@ -78,7 +78,7 @@ jobs:
 
     - name: Setup environment
       run: |
-        sudo rm -rf /usr/local/.ghcup
+        # sudo rm -rf /usr/local/.ghcup
         export DEBIAN_FRONTEND=noninteractive
         sudo apt update && sudo apt upgrade -y
         sudo apt install repo -y

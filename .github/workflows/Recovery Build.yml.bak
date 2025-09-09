@@ -65,11 +65,11 @@ jobs:
       uses: easimon/maximize-build-space@master
       with:
         swap-size-mb: 32768
-        remove-dotnet: true
-        remove-android: true
+        # remove-dotnet: true
+        # remove-android: true
         # remove-haskell: true
-        remove-codeql: true
-        remove-docker-images: true
+        # remove-codeql: true
+        # remove-docker-images: true
 
     - name: Check Out
       uses: actions/checkout@v5
@@ -117,9 +117,8 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
-        (while true; do echo `date +%T` "Building TWRP..."; sleep 30; done) &
+        (while true; do echo `date +%T` "Building TWRP...";free -h; sleep 10; done) &
         KA_PID=$!
-        free -h
         m ${{ github.event.inputs.BUILD_PARTITION }}image -j2
         kill $KA_PID && exit 0
 
