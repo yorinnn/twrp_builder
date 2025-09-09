@@ -92,10 +92,7 @@ jobs:
     - name: Init source
       run: |
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
-        (while true; do echo "Pulling Source..."; sleep 120; done) &
-        KEEP_ALIVE_PID=$!
-        trap "kill $KEEP_ALIVE_PID" EXIT
-        repo sync
+        repo sync 2>&1 | tee sync.log
     
     - name: Setup device
       run: |
@@ -110,10 +107,7 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
-        (while true; do echo "Building TWRP..."; sleep 120; done) &
-        KEEP_ALIVE_PID=$!
-        trap "kill $KEEP_ALIVE_PID" EXIT
-        m ${{ github.event.inputs.BUILD_PARTITION }}image
+        m ${{ github.event.inputs.BUILD_PARTITION }}image 2>&1 | tee build.log
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
