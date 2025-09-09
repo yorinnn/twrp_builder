@@ -107,8 +107,7 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
-        make ${{ github.event.inputs.BUILD_PARTITION }}image
-        # gzip -cd out/verbose.log.gz | less -R
+        m ${{ github.event.inputs.BUILD_PARTITION }}image
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
