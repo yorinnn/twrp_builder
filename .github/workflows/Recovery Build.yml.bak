@@ -61,8 +61,8 @@ jobs:
   - name: Debug ZRAM module presence
     run: |
       set +e
-      sudo apt update
-      sudo apt install linux-modules-extra-$(uname -r)
+      sudo apt update -y
+      sudo apt install linux-modules-extra-$(uname -r) -y
       uname -a # 查看内核版本
       ls /lib/modules/$(uname -r)/kernel/drivers/block/zram/ # 检查zram模块文件是否存在
       lsmod | grep zram # 检查zram是否已经加载
