@@ -76,9 +76,18 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Check swap
+      run: |
+        echo Current swapness:
+        sudo cat /proc/sys/vm/swappiness
+        echo Setting new swapness
+        sudo sysctl -w vm.swappiness=80
+        echo New swapness:
+        sudo cat /proc/sys/vm/swappiness
+
     - name: Setup environment
       run: |
-        sudo rm -rf /usr/local/.ghcup
+        # sudo rm -rf /usr/local/.ghcup
         export DEBIAN_FRONTEND=noninteractive
         sudo apt update && sudo apt upgrade -y
         sudo apt install repo -y
@@ -119,7 +128,7 @@ jobs:
         fi
         (while true; do echo `date +%T` "Building TWRP...";free -h; sleep 10; done) &
         KA_PID=$!
-        m ${{ github.event.inputs.BUILD_PARTITION }}image -j2
+        m ${{ github.event.inputs.BUILD_PARTITION }}image
         kill $KA_PID && exit 0
 
     - name: Upload to Release
