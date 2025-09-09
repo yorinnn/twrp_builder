@@ -58,6 +58,18 @@ jobs:
           echo EOF
         } >> "$GITHUB_ENV"
 
+  - name: Debug ZRAM module presence
+    run: |
+      set +e
+      sudo apt update
+      sudo apt install linux-modules-extra-$(uname -r)
+      uname -a # 查看内核版本
+      ls /lib/modules/$(uname -r)/kernel/drivers/block/zram/ # 检查zram模块文件是否存在
+      lsmod | grep zram # 检查zram是否已经加载
+      sudo modprobe zram # 尝试加载
+      echo $? # 打印上一个命令的退出码
+      lsmod | grep zram # 再次检查是否加载成功
+
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
 
@@ -81,7 +93,7 @@ jobs:
         echo Current swapness:
         sudo cat /proc/sys/vm/swappiness
         echo Setting new swapness
-        sudo sysctl -w vm.swappiness=80
+        sudo sysctl -w vm.swappiness=100
         echo New swapness:
         sudo cat /proc/sys/vm/swappiness
 
