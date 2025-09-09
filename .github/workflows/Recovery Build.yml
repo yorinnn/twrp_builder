@@ -99,6 +99,7 @@ jobs:
         
     - name: Build TWRP
       run: |
+        export TERM=xterm
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         if [ -n "${{ github.event.inputs.LUNCH_TARGET }}" ]; then
@@ -106,8 +107,8 @@ jobs:
         else
           lunch twrp_${{ github.event.inputs.DEVICE_NAME }}
         fi
-        make ${{ github.event.inputs.BUILD_PARTITION }}image &
-        gzip -cd out/verbose.log.gz | less -R
+        make ${{ github.event.inputs.BUILD_PARTITION }}image
+        # gzip -cd out/verbose.log.gz | less -R
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
