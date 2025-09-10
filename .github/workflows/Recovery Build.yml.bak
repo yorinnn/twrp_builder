@@ -63,7 +63,7 @@ jobs:
 
     - name: Maximize build space
       uses: easimon/maximize-build-space@master
-      with:
+      # with:
         # swap-size-mb: 32768
         # remove-dotnet: true
         # remove-android: true
@@ -100,6 +100,8 @@ jobs:
         sudo zramctl
         echo ----------------------------------------
         cat  /etc/default/zramswap
+        sudo sed -i 's/^#PERCENT=50/PERCENT=95/' /etc/default/zramswap
+        sudo sed -i 's/^#PRIORITY=100/PRIORITY=1000/' /etc/default/zramswap
         
     - name: Check Out
       uses: actions/checkout@v5

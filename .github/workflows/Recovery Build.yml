@@ -100,6 +100,11 @@ jobs:
         sudo zramctl
         echo ----------------------------------------
         cat  /etc/default/zramswap
+        sudo sed -i 's/^#PERCENT=50/PERCENT=95/' /etc/default/zramswap
+        sudo sed -i 's/^#PRIORITY=100/PRIORITY=1000/' /etc/default/zramswap
+        sudo systemctl restart zramswap
+        zramctl
+        swapon --show
         
     - name: Check Out
       uses: actions/checkout@v5
