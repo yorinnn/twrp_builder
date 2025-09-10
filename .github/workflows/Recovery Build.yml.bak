@@ -73,7 +73,7 @@ jobs:
         
     - name: Debug ZRAM module presence
       run: |
-        # set +e
+        set +e
         sudo apt install linux-modules-extra-$(uname -r) -y
         sudo modprobe zram # 尝试加载
         lsmod | grep zram # 再次检查是否加载成功
@@ -88,15 +88,15 @@ jobs:
         ZRAM_DEVICE=`sudo zramctl -f`
         sudo swapoff $ZRAM_DEVICE
         sudo zramctl --reset $ZRAM_DEVICE
-        sudo zramctl --size ${ZRAM_SIZE_KB}K --alg lz4 $ZRAM_DEVICE
+        sudo zramctl --size ${ZRAM_SIZE_KB}K --alg lz4 $ZRAM_DEVICE 
 
         # 格式化zram设备为swap分区
         sudo mkswap $ZRAM_DEVICE
         sudo swapon -p 100 $ZRAM_DEVICE
 
         # 验证ZRAM是否已启用
-        swapon --show
-        zramctl
+        sudo swapon --show
+        sudo zramctl
         
     - name: Check Out
       uses: actions/checkout@v5

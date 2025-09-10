@@ -86,6 +86,7 @@ jobs:
         echo "Configuring ZRAM size to: ${ZRAM_SIZE_MB} MB"
         sudo modprobe zram num_devices=1
         ZRAM_DEVICE=`sudo zramctl -f`
+        ZRAM_DEVICE=/dev/zram0
         sudo swapoff $ZRAM_DEVICE
         sudo zramctl --reset $ZRAM_DEVICE
         sudo zramctl --size ${ZRAM_SIZE_KB}K --alg lz4 $ZRAM_DEVICE 
