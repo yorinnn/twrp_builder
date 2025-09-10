@@ -58,13 +58,13 @@ jobs:
           echo EOF
         } >> "$GITHUB_ENV"
 
-    - name: Cleanup
-      uses: rokibhasansagar/slimhub_actions@main
+    # - name: Cleanup
+      # uses: rokibhasansagar/slimhub_actions@main
 
     - name: Maximize build space
       uses: easimon/maximize-build-space@master
       with:
-        swap-size-mb: 32768
+        # swap-size-mb: 32768
         # remove-dotnet: true
         # remove-android: true
         # remove-haskell: true
@@ -98,6 +98,8 @@ jobs:
         # 验证ZRAM是否已启用
         sudo swapon --show
         sudo zramctl
+        echo ----------------------------------------
+        cat  /etc/default/zramswap
         
     - name: Check Out
       uses: actions/checkout@v5
