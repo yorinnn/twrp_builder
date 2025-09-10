@@ -130,6 +130,11 @@ echo "$repo_name"
         TIP_PID=$!
         repo sync
         kill $TIP_PID && exit 0
+    
+    - name: Checkout source
+      run: |
+      if: steps.cache-source.outputs.cache-hit == 'true'
+        repo sync -l
 
     - name: Setup device
       run: |

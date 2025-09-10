@@ -65,9 +65,6 @@ jobs:
           echo EOF
         } >> "$GITHUB_ENV"
         echo BUILD_DATE=`date +%F` >> "$GITHUB_ENV"
-        repo_url="https://github.com/TWRP-Test/platform_manifest_twrp_aosp"
-repo_name=$(basename "$repo_url")
-echo "$repo_name"
         echo "REPO_NAME=$(basename ${{ github.event.inputs.TWRP_MANIFEST_URL }})" >> "$GITHUB_ENV"
         echo -e "$GITHUB_ENV"
 
