@@ -58,48 +58,6 @@ jobs:
           echo EOF
         } >> "$GITHUB_ENV"
 
-    - name: Debug ZRAM module presence
-      run: |
-        set +e
-        sudo apt update -y
-        sudo apt install linux-modules-extra-$(uname -r) -y
-        uname -a # 查看内核版本
-        ls /lib/modules/$(uname -r)/kernel/drivers/block/zram/ # 检查zram模块文件是否存在
-        lsmod | grep zram # 检查zram是否已经加载
-        sudo modprobe zram # 尝试加载
-        echo $? # 打印上一个命令的退出码
-        lsmod | grep zram # 再次检查是否加载成功
-        sudo apt-get update
-        sudo apt-get install -y zram-tools # zram-tools 是一个方便的工具，可以帮助配置ZRAM
-        # 禁用现有ZRAM设备（如果存在）
-        sudo swapoff -a
-        sudo zramctl --reset || true # 如果没有zram设备，这个命令可能会失败，所以加上 || true
-
-        # 配置ZRAM设备
-        # 这里我们创建一个ZRAM设备，大小为物理RAM的50%
-        # 你可以根据需要调整大小。例如，1G 可以写成 --size 1G
-        # 这里的例子是动态计算内存大小
-        MEM_TOTAL_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-        ZRAM_SIZE_KB=$((MEM_TOTAL_KB)) # 50% of RAM
-        ZRAM_SIZE_MB=$((ZRAM_SIZE_KB / 1024)) # Convert to MB for clarity
-
-        echo "Total RAM: ${MEM_TOTAL_KB} KB"
-        echo "Configuring ZRAM size to: ${ZRAM_SIZE_MB} MB"
-
-        # 创建一个zram设备 /dev/zram0
-        sudo modprobe zram num_devices=1
-        sudo zramctl --size ${ZRAM_SIZE_KB}K --alg lz4 /dev/zram0
-
-        # 格式化zram设备为swap分区
-        sudo mkswap /dev/zram0
-
-        # 启用zram swap
-        # priority 可以设置，数字越大，优先级越高，越会被优先使用
-        sudo swapon -p 100 /dev/zram0
-
-        # 验证ZRAM是否已启用
-        swapon --show
-
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
 
@@ -112,7 +70,32 @@ jobs:
         # remove-haskell: true
         # remove-codeql: true
         # remove-docker-images: true
+        
+    - name: Debug ZRAM module presence
+      run: |
+        # set +e
+        sudo apt install linux-modules-extra-$(uname -r) -y
+        sudo modprobe zram # 尝试加载
+        lsmod | grep zram # 再次检查是否加载成功
+        sudo apt-get install -y zram-tools # zram-tools 是一个方便的工具，可以帮助配置ZRAM
+        MEM_TOTAL_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+        ZRAM_SIZE_KB=$((MEM_TOTAL_KB)) # 50% of RAM
+        ZRAM_SIZE_MB=$((ZRAM_SIZE_KB / 1024)) # Convert to MB for clarity
 
+        echo "Total RAM: ${MEM_TOTAL_KB} KB"
+        echo "Configuring ZRAM size to: ${ZRAM_SIZE_MB} MB"
+        sudo modprobe zram num_devices=1
+        sudo swapoff /dev/zram0
+        sudo zramctl --size ${ZRAM_SIZE_KB}K --alg lz4 /dev/zram0
+
+        # 格式化zram设备为swap分区
+        sudo mkswap /dev/zram0
+        sudo swapon -p 100 /dev/zram0
+
+        # 验证ZRAM是否已启用
+        swapon --show
+        zramctl
+        
     - name: Check Out
       uses: actions/checkout@v5
       with:
@@ -145,6 +128,9 @@ jobs:
           git log --pretty=format:"- %h-%an: %s" >> INFO.txt
         fi
         cat INFO.txt
+
+
+
 
     - name: Init source
       run: |
