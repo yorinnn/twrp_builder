@@ -74,7 +74,7 @@ jobs:
     - name: Setup zram
       run: |
         set +e
-        sudo apt install linux-modules-extra-$(uname -r) -y
+        sudo apt install linux-modules-extra-$(uname -r) zram-tools -y
         sudo modprobe zram
         echo ----------------------------------------
         sudo sed -i 's/^#PERCENT=50/PERCENT=95/' /etc/default/zramswap
