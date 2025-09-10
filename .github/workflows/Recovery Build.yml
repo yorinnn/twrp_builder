@@ -59,7 +59,7 @@ jobs:
           echo Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}
           echo Device Path: ${{ github.event.inputs.DEVICE_PATH }}
           echo Device name: ${{ github.event.inputs.DEVICE_NAME }}
-          echo Lunch target: ${LUNCH_TARGET}
+          echo Lunch target: ${{ env.LUNCH_TARGET }}
           echo Build Target: ${{ github.event.inputs.BUILD_PARTITION }}.img
           echo Build date: `date`
           echo
