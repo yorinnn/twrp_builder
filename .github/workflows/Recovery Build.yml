@@ -114,8 +114,8 @@ jobs:
         (while true; do echo "Syncing source..."; sleep 120; done) &
         KA_PID=$!
         repo sync
-        kill $KA_PID && exit 0
         export
+        kill $KA_PID && exit 0
 
     - name: Setup device
       run: |
@@ -127,7 +127,7 @@ jobs:
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         export USE_CCACHE=1
-        export CCACHE_EXEC=ccache
+        export CCACHE_EXEC=$(command -v ccache)
         export CCACHE_DIR=.ccache
         export
         if [ -n "${{ github.event.inputs.LUNCH_TARGET }}" ]; then
