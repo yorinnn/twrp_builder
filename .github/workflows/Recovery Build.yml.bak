@@ -65,6 +65,10 @@ jobs:
           echo EOF
         } >> "$GITHUB_ENV"
         echo BUILD_DATE=`date +%F` >> "$GITHUB_ENV"
+        repo_url="https://github.com/TWRP-Test/platform_manifest_twrp_aosp"
+repo_name=$(basename "$repo_url")
+echo "$repo_name"
+        echo "REPO_NAME=$(basename ${{ github.event.inputs.TWRP_MANIFEST_URL }})" >> "$GITHUB_ENV"
         echo -e "$GITHUB_ENV"
 
     - name: Cleanup
@@ -111,8 +115,16 @@ jobs:
         fi
         cat INFO.txt
 
-    - name: Init source
+    - name: Set up source cache
+      id: cache-source
+      uses: actions/cache@v4
+      with:
+        path: .repo
+        key: ${{ env.REPO_NAME }}-${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}
+
+    - name: Sync source
       run: |
+        if: steps.cache-source.outputs.cache-hit != 'true'
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
         (while true; do echo "Syncing source..."; sleep 60; done) &
         TIP_PID=$!
@@ -141,7 +153,7 @@ jobs:
         files: | 
           out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_PARTITION }}.img
         name: TWRP-3.7.1-16-${{ github.event.inputs.DEVICE_NAME }}-${{ env.BUILD_DATE }}-${{ github.run_id }}
-        tag_name: ${{ github.run_id }}
+        tag_name: ${{ env.BUILD_DATE }}-${{ github.run_id }}
         body_path: INFO.txt
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
