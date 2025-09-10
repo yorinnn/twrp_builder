@@ -66,7 +66,6 @@ jobs:
         } >> "$GITHUB_ENV"
         echo BUILD_DATE=`date +%F` >> "$GITHUB_ENV"
         echo "REPO_NAME=$(basename ${{ github.event.inputs.TWRP_MANIFEST_URL }})" >> "$GITHUB_ENV"
-        echo -e "$GITHUB_ENV"
 
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
