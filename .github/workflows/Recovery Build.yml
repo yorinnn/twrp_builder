@@ -130,7 +130,7 @@ jobs:
     
     - name: Checkout source
       run: |
-      if: steps.cache-source.outputs.cache-hit == 'true'
+        if: steps.cache-source.outputs.cache-hit == 'true'
         repo sync -l
 
     - name: Setup device
