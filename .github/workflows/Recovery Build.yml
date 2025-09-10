@@ -103,6 +103,11 @@ jobs:
         fi
         cat INFO.txt
 
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        create-symlink: true
+
     - name: Init source
       run: |
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
@@ -110,6 +115,7 @@ jobs:
         KA_PID=$!
         repo sync
         kill $KA_PID && exit 0
+        export
 
     - name: Setup device
       run: |
@@ -120,6 +126,10 @@ jobs:
         rm -rf .repo # remove source
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
+        export USE_CCACHE=1
+        export CCACHE_EXEC=ccache
+        export CCACHE_DIR=.ccache
+        export
         if [ -n "${{ github.event.inputs.LUNCH_TARGET }}" ]; then
           lunch twrp_${{ github.event.inputs.LUNCH_TARGET }}
         else
