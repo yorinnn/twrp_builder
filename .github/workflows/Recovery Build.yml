@@ -119,8 +119,8 @@ jobs:
         key: ${{ env.REPO_NAME }}-${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}
 
     - name: Sync source
+      if: steps.cache-source.outputs.cache-hit != 'true'
       run: |
-        if: steps.cache-source.outputs.cache-hit != 'true'
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
         (while true; do echo "Syncing source..."; sleep 60; done) &
         TIP_PID=$!
@@ -128,8 +128,8 @@ jobs:
         kill $TIP_PID && exit 0
     
     - name: Checkout source
+      if: steps.cache-source.outputs.cache-hit == 'true'
       run: |
-        if: steps.cache-source.outputs.cache-hit == 'true'
         repo sync -l
 
     - name: Setup device
