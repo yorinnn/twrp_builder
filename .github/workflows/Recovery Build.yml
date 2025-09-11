@@ -160,3 +160,7 @@ jobs:
         body_path: INFO.txt
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: clean
+      run: |
+        rm -rf out
