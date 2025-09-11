@@ -111,26 +111,13 @@ jobs:
         fi
         cat INFO.txt
 
-    - name: Set up source cache
-      id: cache-source
-      uses: actions/cache@v4
-      with:
-        path: .repo
-        key: ${{ env.REPO_NAME }}-${{ github.event.inputs.TWRP_MANIFEST_BRANCH }}
-
     - name: Sync source
-      if: steps.cache-source.outputs.cache-hit != 'true'
       run: |
         repo init -u ${{ github.event.inputs.TWRP_MANIFEST_URL }} -b ${{ github.event.inputs.TWRP_MANIFEST_BRANCH }} --depth=1
         (while true; do echo "Syncing source..."; sleep 60; done) &
         TIP_PID=$!
         repo sync
         kill $TIP_PID && exit 0
-    
-    - name: Checkout source
-      if: steps.cache-source.outputs.cache-hit == 'true'
-      run: |
-        repo sync -l
 
     - name: Setup device
       run: |
@@ -160,7 +147,3 @@ jobs:
         body_path: INFO.txt
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: clean
-      run: |
-        rm -rf out
